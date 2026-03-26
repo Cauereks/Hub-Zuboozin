@@ -262,3 +262,24 @@ const optimizeVideos = () => {
 };
 
 document.addEventListener('DOMContentLoaded', optimizeVideos);
+
+document.addEventListener('mousemove', function(e) {
+  const snowflake = document.createElement('span');
+  snowflake.innerHTML = '❄'; // Ou um SVG de floco
+  snowflake.style.position = 'fixed';
+  snowflake.style.left = e.clientX + 'px';
+  snowflake.style.top = e.clientY + 'px';
+  snowflake.style.pointerEvents = 'none';
+  snowflake.style.color = 'rgba(180, 210, 255, 0.8)';
+  snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
+  snowflake.style.zIndex = '9999';
+  
+  // Animação de queda e fade
+  const animation = snowflake.animate([
+    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+    { transform: `translateY(50px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+  ], { duration: 1000, easing: 'ease-out' });
+
+  document.body.appendChild(snowflake);
+  animation.onfinish = () => snowflake.remove();
+});

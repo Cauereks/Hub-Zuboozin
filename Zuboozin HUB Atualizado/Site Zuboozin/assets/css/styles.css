@@ -18,24 +18,38 @@
   --snow-glow: rgba(120, 180, 255, .32);
 }
 
+/* Forçamos o cursor em todos os elementos */
 * {
-  box-sizing: border-box;
+  cursor: url("../../images/cursor/NORMAL.cur"), auto !important;
 }
 
 html, body {
   margin: 0;
   padding: 0;
+  min-height: 100vh;
 }
 
 body {
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   background:
-    radial-gradient(900px 500px at 100% 0%, rgba(24, 123, 255, .06) 0%, transparent 60%),
+    radial-gradient(900px 500px at 100% -10%, rgba(24, 123, 255, .06) 0%, transparent 60%),
     radial-gradient(1100px 600px at 0% 0%, rgba(24, 123, 255, .07) 0%, transparent 60%),
     var(--bg);
   color: var(--text);
   line-height: 1.6;
   overflow-x: hidden;
+}
+
+/* Cursor para elementos de clique (Mão apontando) */
+a, 
+button, 
+.social-card, 
+.btn-copy, 
+.menu-toggle, 
+[role="button"],
+.logo,
+.nav a {
+  cursor: url("../../images/cursor/NORMAL - Tailless.cur"), pointer !important;
 }
 
 /* Canvas de neve */
@@ -99,7 +113,6 @@ body {
   border: 0;
   color: var(--text);
   font-size: 22px;
-  cursor: pointer;
 }
 
 /* ===== HERO ===== */
@@ -223,10 +236,6 @@ body {
   justify-content: center;
   gap: 24px;
   width: 100%;
-}
-
-.games-grid .cs2wb-card {
-  margin-inline: 0;
 }
 
 .cs2wb-card {
@@ -537,7 +546,6 @@ body {
   color: var(--wb-primary);
   border-radius: 6px;
   padding: 6px;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
