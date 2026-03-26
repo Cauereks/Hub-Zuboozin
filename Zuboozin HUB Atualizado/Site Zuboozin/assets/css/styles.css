@@ -885,3 +885,106 @@ button,
   -webkit-mask-position: center;
   mask-position: center;
 }
+
+/* ================================================= */
+/* TEMA ESCURO (DARK)                                */
+/* ================================================= */
+
+/* Variáveis para o modo escuro */
+[data-theme="dark"] {
+  --bg: #0b1120;
+  --bg-2: #111827;
+  --surface: #1e293b;
+  --surface-2: #334155;
+  --border: #334155;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --primary: #3b82f6;
+  --primary-600: #60a5fa;
+  --accent: #1e3a8a;
+  --shadow: 0 10px 30px rgba(0, 0, 0, .4);
+
+  /* Neve / Título */
+  --snow-stroke: rgba(180, 210, 255, .9);
+  --snow-glow: rgba(120, 180, 255, .2);
+
+  /* === Setup Compacto (Atenção a cor e opacidade) === */
+  --sc-bg: #151e32; 
+  --sc-border: rgba(255, 255, 255, 0.08); 
+  --sc-frost: rgba(96, 165, 250, 0.12); 
+  
+  /* Cards CS2 e Valorant */
+  --wb-bg: #0b1120;
+  --wb-surface: #151e32;
+  --wb-text: #e2e8f0;
+  --wb-muted: #94a3b8;
+  --wb-primary: #3b82f6;
+  --wb-primary-600: #60a5fa;
+  --wb-border: #334155;
+}
+
+/* Sobrescritas para elementos com cores absolutas no CSS original */
+[data-theme="dark"] .header {
+  background: rgba(11, 17, 32, 0.8);
+}
+[data-theme="dark"] .nav {
+  background: rgba(11, 17, 32, 0.95);
+}
+[data-theme="dark"] .section__head h2,
+[data-theme="dark"] .cs2wb-row dd {
+  color: var(--text);
+}
+[data-theme="dark"] .cs2wb-row {
+  background: var(--surface-2);
+}
+[data-theme="dark"] .footer {
+  background: var(--bg);
+}
+[data-theme="dark"] .cs2wb-cross code {
+  background: var(--surface-2);
+}
+[data-theme="dark"] .cs2wb-rank-badge {
+  background: linear-gradient(180deg, var(--surface), var(--bg-2));
+}
+[data-theme="dark"] .cs2wb-rank-badge.faceit {
+  background: linear-gradient(180deg, #1e3a8a, #0f172a);
+  color: #93c5fd;
+}
+[data-theme="dark"] .discord-status {
+  background: rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+[data-theme="dark"] .setup__overlay {
+  background: rgba(5, 10, 18, 0.8);
+}
+
+/* Estilização do Botão de Alternar Tema (Ícones SVG) */
+.theme-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  margin-left: 20px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.theme-toggle-btn:hover {
+  transform: scale(1.15) rotate(10deg);
+  color: var(--primary-600);
+}
+
+/* Lógica visual de mostrar/ocultar os ícones consoante o tema ativo */
+.icon-sun { display: none; }
+.icon-moon { display: block; }
+
+[data-theme="dark"] .icon-sun { display: block; }
+[data-theme="dark"] .icon-moon { display: none; }
+
+@media (max-width: 900px) {
+  .theme-toggle-btn {
+    margin: 12px 0;
+  }
+}

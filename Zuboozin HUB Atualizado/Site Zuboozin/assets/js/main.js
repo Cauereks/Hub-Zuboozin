@@ -283,3 +283,24 @@ document.addEventListener('mousemove', function(e) {
   document.body.appendChild(snowflake);
   animation.onfinish = () => snowflake.remove();
 });
+
+/* ===== Alternador de Tema (Dark/Light) ===== */
+const themeToggleBtn = document.getElementById('theme-toggle');
+
+// Recupera o tema guardado ou usa 'light' como predefinição
+const currentTheme = localStorage.getItem('theme') || 'light';
+
+// Aplica o tema inicial 
+document.documentElement.setAttribute('data-theme', currentTheme);
+
+if (themeToggleBtn) {
+  themeToggleBtn.addEventListener('click', () => {
+    // Inverte o estado do tema
+    let theme = document.documentElement.getAttribute('data-theme');
+    let targetTheme = theme === 'dark' ? 'light' : 'dark';
+    
+    // Aplica a mudança e guarda a preferência do utilizador
+    document.documentElement.setAttribute('data-theme', targetTheme);
+    localStorage.setItem('theme', targetTheme);
+  });
+}
