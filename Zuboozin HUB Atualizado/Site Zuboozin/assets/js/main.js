@@ -64,7 +64,6 @@ function setupCopyButton(btnId, codeId, feedbackId) {
   }
 }
 
-// Inicializa os botões de copiar
 setupCopyButton('btn-copy-crosshair', 'cs2wb-crosshair', 'cs2wb-feedback');
 setupCopyButton('btn-copy-val', 'val-crosshair', 'val-feedback');
 
@@ -83,19 +82,14 @@ async function fetchDiscordStatus() {
     const nameEl = document.getElementById('ds-name');
     const activityEl = document.getElementById('ds-activity');
 
-    // 1. Atualiza Foto de Perfil
     if (data.discord_user.avatar) {
       pfp.src = `https://cdn.discordapp.com/avatars/${DISCORD_ID}/${data.discord_user.avatar}.png`;
       pfp.style.display = 'block';
     }
 
-    // 2. Atualiza Nome
     nameEl.textContent = data.discord_user.display_name || data.discord_user.username;
-
-    // 3. Atualiza a bolinha de Status
     indicator.className = `ds-indicator ${data.discord_status}`;
 
-    // 4. Lógica de Atividade Inteligente
     let activityText = 'Apenas chillando'; 
     
     if (data.listening_to_spotify && data.spotify) {
@@ -126,63 +120,143 @@ async function fetchDiscordStatus() {
   }
 }
 
-// Inicia a busca imediatamente e atualiza a cada 10s
 fetchDiscordStatus();
 setInterval(fetchDiscordStatus, 10000);
 
-/* ===== Neve leve (Canvas) — OTIMIZADA PARA MOBILE ===== */
-(function snowEffect() {
+
+/* ====================================================================== */
+/* ===== ENGINE DE NEVE AVANÇADA (Física Interativa + Parallax 3D) ====== */
+/* ====================================================================== */
+(function advancedSnowEffect() {
   const canvas = document.getElementById('snow');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  let width, height, flakes = [];
   
+  let width, height;
+  let flakes = [];
   let isPlaying = true;
   let animationId;
+  
+  // Variáveis para interação do mouse
+  let mouse = { x: -1000, y: -1000, radius: 150 };
+
+  // Rastrear posição do mouse na tela
+  window.addEventListener('mousemove', (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+  });
+
+  // Tira o "campo de força" quando o mouse sai da tela
+  window.addEventListener('mouseout', () => {
+    mouse.x = -1000;
+    mouse.y = -1000;
+  });
+
+  class Snowflake {
+    constructor() {
+      this.init();
+      // Espalha a neve por toda a tela no carregamento inicial
+      this.y = Math.random() * height; 
+    }
+
+    init() {
+      // Eixo Z determina a profundidade (Parallax). 1 é perto, 3 é fundo.
+      this.z = Math.random() * 2 + 0.5; 
+      
+      this.x = Math.random() * width;
+      this.y = -(Math.random() * 50) - 10; // Começa um pouco acima do canvas
+      
+      // Velocidade base (vetores)
+      this.vx = (Math.random() - 0.5) * 0.5; // Vento lateral natural
+      this.vy = (Math.random() * 1.5 + 0.5) / this.z; // Velocidade de queda baseada no Z
+      
+      // Tamanho baseado na profundidade (flocos mais próximos são maiores)
+      this.radius = (Math.random() * 2.5 + 1.5) / this.z;
+      
+      // Oscilação orgânica (como uma folha caindo)
+      this.wobble = Math.random() * Math.PI * 2;
+      this.wobbleSpeed = Math.random() * 0.05 + 0.01;
+    }
+
+    update() {
+      // Movimento natural de balanço lateral
+      this.wobble += this.wobbleSpeed;
+      const sway = Math.sin(this.wobble) * (0.5 / this.z);
+
+      // --- Interação Magnética com o Mouse ---
+      let dx = this.x - mouse.x;
+      let dy = this.y - mouse.y;
+      let distance = Math.sqrt(dx * dx + dy * dy);
+
+      // Se o floco estiver dentro do raio de interação do mouse
+      if (distance < mouse.radius) {
+        // Força diminui quanto mais longe do centro do mouse
+        let forceDirectionX = dx / distance;
+        let forceDirectionY = dy / distance;
+        let force = (mouse.radius - distance) / mouse.radius;
+        
+        // Aplica a força na velocidade (vetores)
+        this.vx += forceDirectionX * force * 0.8;
+        this.vy += forceDirectionY * force * 0.8;
+      }
+
+      // Atrito do ar (Friction) para fazer a neve suavizar após ser empurrada
+      this.vx *= 0.95; 
+      
+      // Limite de velocidade de queda para voltar ao normal depois da repulsão
+      const maxVy = (3 / this.z);
+      if (this.vy < maxVy) {
+        this.vy += 0.03; // Gravidade puxando de volta
+      } else if (this.vy > maxVy) {
+        this.vy *= 0.95; // Resistência do ar freando a queda livre
+      }
+
+      // Atualiza as posições reais do floco
+      this.x += this.vx + sway;
+      this.y += this.vy;
+
+      // Se saiu da tela, recicla o floco
+      if (this.y > height + this.radius || this.x < -50 || this.x > width + 50) {
+        this.init();
+      }
+    }
+
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      
+      // Opacidade dinâmica: flocos ao fundo são mais transparentes
+      const opacity = Math.max(0.2, 1 - (this.z / 3.5));
+      
+      // Cor com base no tema (pode ajustar para ficar mais azulado se quiser)
+      ctx.fillStyle = `rgba(200, 220, 255, ${opacity})`;
+      ctx.fill();
+    }
+  }
 
   function resize() {
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
     
-    // Otimização: Se for telemóvel, limita drasticamente o número de partículas
+    // Otimização Mobile vs Desktop
     const isMobile = window.innerWidth < 768;
-    const maxFlakes = isMobile ? 40 : 140; 
+    const flakeCount = isMobile ? 60 : 250; // Quantidade de flocos
     
-    const count = Math.min(maxFlakes, Math.floor(width * height / 26000));
-    flakes = Array.from({ length: count }, () => newFlake());
-  }
-
-  function newFlake() {
-    return {
-      x: Math.random() * width,
-      y: Math.random() * height,
-      r: Math.random() * 1.8 + 0.6,
-      s: Math.random() * 0.6 + 0.25,
-      w: Math.random() * 1.0 + 0.2,
-      a: Math.random() * Math.PI * 2
-    };
+    // Ajusta o array sem ter que recriar tudo se a tela for apenas redimensionada
+    if (flakes.length !== flakeCount) {
+      flakes = Array.from({ length: flakeCount }, () => new Snowflake());
+    }
   }
 
   function update() {
     if (!isPlaying) return; 
 
+    // Efeito de rastro leve em vez de limpar tudo instantaneamente (traz sensação de fluidez)
     ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = 'rgba(200, 220, 245, 0.85)';
     
-    for (const f of flakes) {
-      f.y += f.s;
-      f.x += Math.sin(f.a += 0.01) * f.w;
-      
-      if (f.y > height + 5) { 
-        f.y = -5; 
-        f.x = Math.random() * width; 
-      }
-      if (f.x > width + 5) f.x = -5;
-      if (f.x < -5) f.x = width + 5;
-      
-      ctx.beginPath();
-      ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
-      ctx.fill();
+    for (const flake of flakes) {
+      flake.update();
+      flake.draw();
     }
     
     animationId = requestAnimationFrame(update);
@@ -192,6 +266,8 @@ setInterval(fetchDiscordStatus, 10000);
   resize();
   update();
 
+  // Performance: Pausa a animação se o usuário rolar para longe do topo 
+  // (Pode ajustar caso queira a neve rolando na página inteira)
   const heroSection = document.getElementById('inicio');
   if (heroSection) {
     const observer = new IntersectionObserver((entries) => {
@@ -215,10 +291,15 @@ setInterval(fetchDiscordStatus, 10000);
       isPlaying = false;
       cancelAnimationFrame(animationId);
     } else {
-      const rect = heroSection.getBoundingClientRect();
-      if (rect.top < window.innerHeight && rect.bottom >= 0) {
-        isPlaying = true;
-        update();
+      if(heroSection) {
+        const rect = heroSection.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom >= 0) {
+          isPlaying = true;
+          update();
+        }
+      } else {
+          isPlaying = true;
+          update();
       }
     }
   });
@@ -231,12 +312,12 @@ const optimizeVideos = () => {
   const videoObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        entry.target.play(); // Começa a rodar apenas quando visível
+        entry.target.play();
       } else {
-        entry.target.pause(); // Pausa para economizar CPU/GPU
+        entry.target.pause();
       }
     });
-  }, { threshold: 0.1 }); // Dispara quando 10% do vídeo aparece
+  }, { threshold: 0.1 });
 
   allVideos.forEach(video => videoObserver.observe(video));
 };
@@ -246,14 +327,11 @@ document.addEventListener('DOMContentLoaded', optimizeVideos);
 /* ===== Alternador de Tema (Dark/Light) ===== */
 const themeToggleBtn = document.getElementById('theme-toggle');
 
-// O setup inicial do tema passou para o <head> do index.html (Evita Flash Branco)
 if (themeToggleBtn) {
   themeToggleBtn.addEventListener('click', () => {
-    // Inverte o estado do tema
     let theme = document.documentElement.getAttribute('data-theme');
     let targetTheme = theme === 'dark' ? 'light' : 'dark';
     
-    // Aplica a mudança e guarda a preferência do utilizador
     document.documentElement.setAttribute('data-theme', targetTheme);
     localStorage.setItem('theme', targetTheme);
   });
