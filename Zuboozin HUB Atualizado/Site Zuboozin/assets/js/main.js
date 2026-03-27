@@ -90,7 +90,7 @@ async function fetchDiscordStatus() {
     nameEl.textContent = data.discord_user.display_name || data.discord_user.username;
     indicator.className = `ds-indicator ${data.discord_status}`;
 
-    let activityText = 'Apenas chillando'; 
+    let activityText = 'Apenas cochilando'; 
     
     if (data.listening_to_spotify && data.spotify) {
       activityText = `Ouvindo: ${data.spotify.artist} - ${data.spotify.song}`;
