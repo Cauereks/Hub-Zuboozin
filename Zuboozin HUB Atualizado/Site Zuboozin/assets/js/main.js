@@ -13,12 +13,7 @@ if (menuToggle && nav) {
 
   menuToggle.addEventListener('click', () => {
     nav.classList.toggle('nav--open');
-    
-    if (nav.classList.contains('nav--open')) {
-      menuToggle.innerHTML = '✕';
-    } else {
-      menuToggle.innerHTML = '☰';
-    }
+    menuToggle.innerHTML = nav.classList.contains('nav--open') ? '✕' : '☰';
   });
 
   nav.querySelectorAll('a').forEach(link => {
@@ -45,53 +40,33 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
   });
 });
 
-/* ===== Funcionalidade: Copiar Mira CS2 ===== */
-const btnCopy = document.getElementById('btn-copy-crosshair');
-const codeCrosshair = document.getElementById('cs2wb-crosshair');
-const feedback = document.getElementById('cs2wb-feedback');
+/* ===== Funcionalidade: Copiar Mira CS2 e Valorant ===== */
+function setupCopyButton(btnId, codeId, feedbackId) {
+  const btn = document.getElementById(btnId);
+  const code = document.getElementById(codeId);
+  const feedback = document.getElementById(feedbackId);
 
-if (btnCopy && codeCrosshair && feedback) {
-  btnCopy.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(codeCrosshair.textContent.trim());
-      feedback.textContent = "✓ Código da mira copiado!";
-      feedback.style.color = "#10b981"; // Verde
-      feedback.classList.add('show');
-      
-      setTimeout(() => {
-        feedback.classList.remove('show');
-      }, 2500);
-    } catch (err) {
-      feedback.textContent = "Erro ao copiar.";
-      feedback.style.color = "#ef4444"; // Vermelho
-      feedback.classList.add('show');
-    }
-  });
+  if (btn && code && feedback) {
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(code.textContent.trim());
+        feedback.textContent = "✓ Código da mira copiado!";
+        feedback.style.color = "#10b981"; // Verde
+        feedback.classList.add('show');
+        
+        setTimeout(() => feedback.classList.remove('show'), 2500);
+      } catch (err) {
+        feedback.textContent = "Erro ao copiar.";
+        feedback.style.color = "#ef4444"; // Vermelho
+        feedback.classList.add('show');
+      }
+    });
+  }
 }
 
-/* ===== Funcionalidade: Copiar Mira Valorant ===== */
-const btnCopyVal = document.getElementById('btn-copy-val');
-const codeCrosshairVal = document.getElementById('val-crosshair');
-const feedbackVal = document.getElementById('val-feedback');
-
-if (btnCopyVal && codeCrosshairVal && feedbackVal) {
-  btnCopyVal.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(codeCrosshairVal.textContent.trim());
-      feedbackVal.textContent = "✓ Código da mira copiado!";
-      feedbackVal.style.color = "#10b981"; // Verde
-      feedbackVal.classList.add('show');
-      
-      setTimeout(() => {
-        feedbackVal.classList.remove('show');
-      }, 2500);
-    } catch (err) {
-      feedbackVal.textContent = "Erro ao copiar.";
-      feedbackVal.style.color = "#ef4444"; // Vermelho
-      feedbackVal.classList.add('show');
-    }
-  });
-}
+// Inicializa os botões de copiar
+setupCopyButton('btn-copy-crosshair', 'cs2wb-crosshair', 'cs2wb-feedback');
+setupCopyButton('btn-copy-val', 'val-crosshair', 'val-feedback');
 
 /* ===== Integração com Lanyard (Discord Status) ===== */
 const DISCORD_ID = '310952599757127681';
@@ -120,7 +95,7 @@ async function fetchDiscordStatus() {
     // 3. Atualiza a bolinha de Status
     indicator.className = `ds-indicator ${data.discord_status}`;
 
-    // 4. Lógica de Atividade Inteligente (com macete para o VS Code)
+    // 4. Lógica de Atividade Inteligente
     let activityText = 'Apenas chillando'; 
     
     if (data.listening_to_spotify && data.spotify) {
@@ -155,7 +130,7 @@ async function fetchDiscordStatus() {
 fetchDiscordStatus();
 setInterval(fetchDiscordStatus, 10000);
 
-/* ===== Neve leve (Canvas) — OTIMIZADA ===== */
+/* ===== Neve leve (Canvas) — OTIMIZADA PARA MOBILE ===== */
 (function snowEffect() {
   const canvas = document.getElementById('snow');
   if (!canvas) return;
@@ -168,7 +143,12 @@ setInterval(fetchDiscordStatus, 10000);
   function resize() {
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
-    const count = Math.min(140, Math.floor(width * height / 26000));
+    
+    // Otimização: Se for telemóvel, limita drasticamente o número de partículas
+    const isMobile = window.innerWidth < 768;
+    const maxFlakes = isMobile ? 40 : 140; 
+    
+    const count = Math.min(maxFlakes, Math.floor(width * height / 26000));
     flakes = Array.from({ length: count }, () => newFlake());
   }
 
@@ -263,36 +243,10 @@ const optimizeVideos = () => {
 
 document.addEventListener('DOMContentLoaded', optimizeVideos);
 
-document.addEventListener('mousemove', function(e) {
-  const snowflake = document.createElement('span');
-  snowflake.innerHTML = '❄'; // Ou um SVG de floco
-  snowflake.style.position = 'fixed';
-  snowflake.style.left = e.clientX + 'px';
-  snowflake.style.top = e.clientY + 'px';
-  snowflake.style.pointerEvents = 'none';
-  snowflake.style.color = 'rgba(180, 210, 255, 0.8)';
-  snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
-  snowflake.style.zIndex = '9999';
-  
-  // Animação de queda e fade
-  const animation = snowflake.animate([
-    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
-    { transform: `translateY(50px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
-  ], { duration: 1000, easing: 'ease-out' });
-
-  document.body.appendChild(snowflake);
-  animation.onfinish = () => snowflake.remove();
-});
-
 /* ===== Alternador de Tema (Dark/Light) ===== */
 const themeToggleBtn = document.getElementById('theme-toggle');
 
-// Recupera o tema guardado ou usa 'light' como predefinição
-const currentTheme = localStorage.getItem('theme') || 'light';
-
-// Aplica o tema inicial 
-document.documentElement.setAttribute('data-theme', currentTheme);
-
+// O setup inicial do tema passou para o <head> do index.html (Evita Flash Branco)
 if (themeToggleBtn) {
   themeToggleBtn.addEventListener('click', () => {
     // Inverte o estado do tema
